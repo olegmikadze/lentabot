@@ -27,7 +27,6 @@ def fillredditlinks():
         # going throw the last new post in each subreddit
         for submission in sub.new(limit=1):
             redditlinks[submission.subreddit_name_prefixed] = str(submission.created_utc)
-            # print(redditlinks)
 fillredditlinks()
 
 def redditcrawling():
