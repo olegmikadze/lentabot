@@ -208,4 +208,3 @@ schedule.every(1).second.do(redditcrawling)
 
 while True:
     schedule.run_pending()
-    time.sleep(1)
