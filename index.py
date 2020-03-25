@@ -18,16 +18,16 @@ reviewlink=''
 articlelink=''
 videolink=''
 blogslink=''
-
+ainlink = ''
 redditlinks = {}
 
 def fillredditlinks():
     for sub in reddit.user.subreddits():
         for submission in sub.new(limit=1):
             redditlinks[submission.subreddit_name_prefixed] = str(submission.created_utc)
-fillredditlinks()
 
 def redditcrawling():
+    fillredditlinks()
     for sub in reddit.user.subreddits():
         for submission in sub.new(limit=1):
             if redditlinks[submission.subreddit_name_prefixed] != str(submission.created_utc):
@@ -74,9 +74,9 @@ def reviewcrawling():
     textpost =  website_content.find_all(class_ = 'entry-excerpt')
 
     global reviewlink
-    if reviewlinks != jobs_link[0].contents[0]['href']:
-        reviewlinks = jobs_link[0].contents[0]['href']
-        parameters = {'chat_id': '230618475', 'text': jobs_link[0].contents[0].contents[0] + "\n" + textpost[0].contents[0] + "\n" + reviewlinks}
+    if reviewlink != jobs_link[0].contents[0]['href']:
+        reviewlink = jobs_link[0].contents[0]['href']
+        parameters = {'chat_id': '230618475', 'text': jobs_link[0].contents[0].contents[0] + "\n" + textpost[0].contents[0] + "\n" + reviewlink}
         message = requests.post('https://api.telegram.org/bot1141601443:AAFu7u3KED3498Qa7XUlFWhXosCNA7qOMeU/sendMessage', data=parameters)
 
 
@@ -146,7 +146,7 @@ def blogcrawling():
         parameters = {'chat_id': '230618475', 'text': jobs_link[0].contents[0].contents[0] + "\n" + textpost[0].contents[0] + "\n" + blogslink}
         message = requests.post('https://api.telegram.org/bot1141601443:AAFu7u3KED3498Qa7XUlFWhXosCNA7qOMeU/sendMessage', data=parameters)
 
-ainlink = ''
+
 
 def aincrawler():
     '''
