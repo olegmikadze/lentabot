@@ -26,8 +26,9 @@ def fillredditlinks():
         for submission in sub.new(limit=1):
             redditlinks[submission.subreddit_name_prefixed] = str(submission.created_utc)
 
+fillredditlinks()
+
 def redditcrawling():
-    fillredditlinks()
     for sub in reddit.user.subreddits():
         for submission in sub.new(limit=1):
             if redditlinks[submission.subreddit_name_prefixed] != str(submission.created_utc):
@@ -181,3 +182,4 @@ schedule.every(1).second.do(aincrawler)
 
 while True:
     schedule.run_pending()
+    time.sleep(1)
