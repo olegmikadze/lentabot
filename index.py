@@ -28,13 +28,12 @@ def fillredditlinks():
 fillredditlinks()
 
 def redditcrawling():
-    for sub in reddit.user.subreddits(): 
+    for sub in reddit.user.subreddits():
         for submission in sub.new(limit=1):
             if redditlinks[submission.subreddit_name_prefixed] != str(submission.created_utc):
                 redditlinks[submission.subreddit_name_prefixed] = str(submission.created_utc)
-                parameters = {'chat_id': '230618475', 'text': "https://www.reddit.com" + submission.permalink}
+                parameters = {'chat_id': '230618475', 'text': submission.subreddit_name_prefixed + ": " + submission.title + "\n\n" + submission.selftext + "\n" + submission.url}
                 message = requests.post('https://api.telegram.org/bot1141601443:AAFu7u3KED3498Qa7XUlFWhXosCNA7qOMeU/sendMessage', data=parameters)
-                return "https://www.reddit.com" + submission.permalink
 
 
 def newscrawling():
@@ -49,17 +48,14 @@ def newscrawling():
 
     website_content = BeautifulSoup(website_request.content, 'html.parser')
     # extract job description
-    jobs_link = website_content.find_all(class_ = 'thumb-responsive')
+    jobs_link = website_content.find_all(class_ = 'entry-title')
+    textpost =  website_content.find_all(class_ = 'entry-excerpt')
 
-
-    
     global newslink
-
-    if newslink != jobs_link[0]['href']:
-        newslink = jobs_link[0]['href']
-        parameters = {'chat_id': '230618475', 'text': newslink}
+    if newslink != jobs_link[0].contents[0]['href']:
+        newslink = jobs_link[0].contents[0]['href']
+        parameters = {'chat_id': '230618475', 'text': jobs_link[0].contents[0].contents[0] + "\n" + textpost[0].contents[0] + "\n" + newslink}
         message = requests.post('https://api.telegram.org/bot1141601443:AAFu7u3KED3498Qa7XUlFWhXosCNA7qOMeU/sendMessage', data=parameters)
-        return(newslink)
 
 
 def reviewcrawling():
@@ -74,14 +70,15 @@ def reviewcrawling():
 
     website_content = BeautifulSoup(website_request.content, 'html.parser')
     # extract job description
-    jobs_link = website_content.find_all(class_ = 'thumb-responsive')
+    jobs_link = website_content.find_all(class_ = 'entry-title')
+    textpost =  website_content.find_all(class_ = 'entry-excerpt')
 
     global reviewlink
-    if reviewlink != jobs_link[0]['href']:
-        reviewlink = jobs_link[0]['href']
-        parameters = {'chat_id': '230618475', 'text': reviewlink}
+    if reviewlinks != jobs_link[0].contents[0]['href']:
+        reviewlinks = jobs_link[0].contents[0]['href']
+        parameters = {'chat_id': '230618475', 'text': jobs_link[0].contents[0].contents[0] + "\n" + textpost[0].contents[0] + "\n" + reviewlinks}
         message = requests.post('https://api.telegram.org/bot1141601443:AAFu7u3KED3498Qa7XUlFWhXosCNA7qOMeU/sendMessage', data=parameters)
-        return reviewlink
+
 
 def articlecrawling():
     '''
@@ -95,14 +92,15 @@ def articlecrawling():
 
     website_content = BeautifulSoup(website_request.content, 'html.parser')
     # extract job description
-    jobs_link = website_content.find_all(class_ = 'thumb-responsive')
+    jobs_link = website_content.find_all(class_ = 'entry-title')
+    textpost =  website_content.find_all(class_ = 'entry-excerpt')
 
     global articlelink
-    if articlelink != jobs_link[0]['href']:
-        articlelink = jobs_link[0]['href']
-        parameters = {'chat_id': '230618475', 'text': articlelink}
+    if articlelink != jobs_link[0].contents[0]['href']:
+        articlelink = jobs_link[0].contents[0]['href']
+        parameters = {'chat_id': '230618475', 'text': jobs_link[0].contents[0].contents[0] + "\n" + textpost[0].contents[0] + "\n" + articlelink}
         message = requests.post('https://api.telegram.org/bot1141601443:AAFu7u3KED3498Qa7XUlFWhXosCNA7qOMeU/sendMessage', data=parameters)
-        return articlelink
+
 
 
 def videocrawling():
@@ -117,14 +115,15 @@ def videocrawling():
 
     website_content = BeautifulSoup(website_request.content, 'html.parser')
     # extract job description
-    jobs_link = website_content.find_all(class_ = 'thumb-responsive')
+    jobs_link = website_content.find_all(class_ = 'entry-title')
+    textpost =  website_content.find_all(class_ = 'entry-excerpt')
 
     global videolink
-    if videolink != jobs_link[0]['href']:
-        videolink = jobs_link[0]['href']
-        parameters = {'chat_id': '230618475', 'text': videolink}
+    if videolink != jobs_link[0].contents[0]['href']:
+        videolink = jobs_link[0].contents[0]['href']
+        parameters = {'chat_id': '230618475', 'text': jobs_link[0].contents[0].contents[0] + "\n" + textpost[0].contents[0] + "\n" + videolink}
         message = requests.post('https://api.telegram.org/bot1141601443:AAFu7u3KED3498Qa7XUlFWhXosCNA7qOMeU/sendMessage', data=parameters)
-        return videolink
+
 
 def blogcrawling():
     '''
@@ -138,14 +137,16 @@ def blogcrawling():
 
     website_content = BeautifulSoup(website_request.content, 'html.parser')
     # extract job description
-    jobs_link = website_content.find_all(class_ = 'thumb-responsive')
+    jobs_link = website_content.find_all(class_ = 'entry-title')
+    textpost =  website_content.find_all(class_ = 'entry-excerpt')
 
     global blogslink
-    if blogslink != jobs_link[0]['href']:
-        blogslink = jobs_link[0]['href']
-        parameters = {'chat_id': '230618475', 'text': blogslink}
+    if blogslink != jobs_link[0].contents[0]['href']:
+        blogslink = jobs_link[0].contents[0]['href']
+        parameters = {'chat_id': '230618475', 'text': jobs_link[0].contents[0].contents[0] + "\n" + textpost[0].contents[0] + "\n" + blogslink}
         message = requests.post('https://api.telegram.org/bot1141601443:AAFu7u3KED3498Qa7XUlFWhXosCNA7qOMeU/sendMessage', data=parameters)
-        return blogslink
+
+
 
 schedule.every(1).second.do(newscrawling)
 schedule.every(1).second.do(reviewcrawling)
