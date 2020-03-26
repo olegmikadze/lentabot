@@ -7,11 +7,7 @@ import praw
 import pandas as pd
 import re
 
-reddit = praw.Reddit(client_id='rk_SiB6rupsdbQ', \
-                     client_secret='fXQ1Bw_EZCphnD9IDgGpZhy55Rs', \
-                     user_agent='lentaua', \
-                     username='olegsan', \
-                     password='EnNbGGkG20')
+
 
 newslink=''
 reviewlink=''
@@ -19,20 +15,7 @@ articlelink=''
 videolink=''
 blogslink=''
 ainlink = ''
-redditlinks = {}
-
-def redditcrawling():
-    print(redditlinks)
-    for sub in reddit.user.subreddits():
-        for submission in sub.new(limit=1):
-            if str(submission.subreddit_name_prefixed) in redditlinks:
-                print(redditlinks[submission.subreddit_name_prefixed], str(submission.created_utc), submission.subreddit_name_prefixed)
-                if redditlinks[submission.subreddit_name_prefixed] != str(submission.created_utc):
-                    redditlinks[submission.subreddit_name_prefixed] = str(submission.created_utc)
-                    parameters = {'chat_id': '230618475', 'text': submission.subreddit_name_prefixed + ": " + submission.title + "\n\n" + submission.selftext + "\n" + submission.url}
-                    message = requests.post('https://api.telegram.org/bot1141601443:AAFu7u3KED3498Qa7XUlFWhXosCNA7qOMeU/sendMessage', data=parameters)
-            else:
-                redditlinks[submission.subreddit_name_prefixed] = ''
+              
 def newscrawling():
     '''
     Args: website_link = string; link of website to be crawled
@@ -207,9 +190,8 @@ schedule.every(1).second.do(reviewcrawling)
 schedule.every(1).second.do(articlecrawling)
 schedule.every(1).second.do(videocrawling)
 schedule.every(1).second.do(blogcrawling)
-schedule.every(1).second.do(redditcrawling)
-schedule.every(1).second.do(aincrawler)
 
+schedule.every(1).second.do(aincrawler)
 
 while True:
     schedule.run_pending()
