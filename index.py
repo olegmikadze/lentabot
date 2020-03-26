@@ -205,6 +205,29 @@ def aincrawler():
         message = requests.post('https://api.telegram.org/bot1141601443:AAFu7u3KED3498Qa7XUlFWhXosCNA7qOMeU/sendMessage', data=parameters)
 
 
+minfinlink = ''
+
+def minfincrawler():
+    '''
+    Args: website_link = string; link of website to be crawled
+          link_class = string; class name for job link on website
+    Returns: jobs_link = list; list of jobs
+    '''
+
+    # get content of website and parse it
+    website_request = requests.get('https://minfin.com.ua/ua/news/', timeout=5)
+    website_content = BeautifulSoup(website_request.content, 'html.parser')
+
+    jobs_link = website_content.find_all(class_ = 'item')
+
+    global minfinlink
+    if minfinlink != jobs_link[0].contents[3].contents[1]['href']:
+        minfinlink = jobs_link[0].contents[3].contents[1]['href']
+        parameters = {'chat_id': '230618475', 'text': jobs_link[0].contents[3].contents[1].text + "\n" + 'https://minfin.com.ua'+jobs_link[0].contents[3].contents[1]['href']}
+        message = requests.post('https://api.telegram.org/bot1141601443:AAFu7u3KED3498Qa7XUlFWhXosCNA7qOMeU/sendMessage', data=parameters)
+
+
+
 
 schedule.every(1).second.do(newscrawling)
 schedule.every(1).second.do(reviewcrawling)
@@ -213,6 +236,7 @@ schedule.every(1).second.do(videocrawling)
 schedule.every(1).second.do(blogcrawling)
 schedule.every(1).second.do(redditcrawling)
 schedule.every(1).second.do(aincrawler)
+schedule.every(1).second.do(minfincrawler)
 
 while True:
     schedule.run_pending()
