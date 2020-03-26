@@ -24,7 +24,7 @@ def newscrawling():
     '''
 
     # get content of website and parse it
-    website_request = requests.get('https://itc.ua/news', timeout=1)
+    website_request = requests.get('https://itc.ua/news', timeout=5)
 
     website_content = BeautifulSoup(website_request.content, 'html.parser')
     # extract job description
@@ -53,7 +53,7 @@ def reviewcrawling():
     '''
 
     # get content of website and parse it
-    website_request = requests.get('https://itc.ua/articles', timeout=1)
+    website_request = requests.get('https://itc.ua/articles', timeout=5)
 
     website_content = BeautifulSoup(website_request.content, 'html.parser')
     # extract job description
@@ -82,7 +82,7 @@ def articlecrawling():
     '''
 
     # get content of website and parse it
-    website_request = requests.get('https://itc.ua/stati', timeout=1)
+    website_request = requests.get('https://itc.ua/stati', timeout=5)
 
     website_content = BeautifulSoup(website_request.content, 'html.parser')
     # extract job description
@@ -112,7 +112,7 @@ def videocrawling():
     '''
 
     # get content of website and parse it
-    website_request = requests.get('https://itc.ua/video', timeout=1)
+    website_request = requests.get('https://itc.ua/video', timeout=5)
 
     website_content = BeautifulSoup(website_request.content, 'html.parser')
     # extract job description
@@ -141,7 +141,7 @@ def blogcrawling():
     '''
 
     # get content of website and parse it
-    website_request = requests.get('https://itc.ua/blogs', timeout=1)
+    website_request = requests.get('https://itc.ua/blogs', timeout=5)
 
     website_content = BeautifulSoup(website_request.content, 'html.parser')
     # extract job description
@@ -171,7 +171,7 @@ def aincrawler():
     '''
 
     # get content of website and parse it
-    website_request = requests.get('https://ain.ua/post-list/', timeout=1)
+    website_request = requests.get('https://ain.ua/post-list/', timeout=5)
     website_content = BeautifulSoup(website_request.content, 'html.parser')
    
     # extract job description
@@ -195,4 +195,3 @@ schedule.every(1).second.do(aincrawler)
 
 while True:
     schedule.run_pending()
-    time.sleep(20)
