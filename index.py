@@ -195,4 +195,4 @@ schedule.every(1).second.do(aincrawler)
 
 while True:
     schedule.run_pending()
-    time.sleep(2)
+    time.sleep(5)
