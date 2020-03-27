@@ -288,6 +288,6 @@ while True:
         schedule.run_pending()
         break
     except Exception as inst:
-...     print(type(inst))    # the exception instance
+        print(type(inst))
 
 
