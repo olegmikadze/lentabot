@@ -283,5 +283,11 @@ schedule.every(1).second.do(aincrawler)
 schedule.every(1).second.do(minfincrawler)
 
 while True:
-    run_main()
-    schedule.run_pending()
+    try:
+        run_main()
+        schedule.run_pending()
+        break
+    except Exception as inst:
+...     print(type(inst))    # the exception instance
+
+
