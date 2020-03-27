@@ -16,40 +16,20 @@ import asyncio
 api_id = 1351607
 api_hash = '78482690f0761d1396e013a98c93e7b8'
 telegramclient = TelegramClient('anon', api_id, api_hash)
-channellinks = {
-    'habr.com': '',
-    'Говорить Україна': '',
-    "Адвокат Права": '',
-    'Технологии, медиа и общество': '',
-    'Библиотека программиста': '',
-    'Cinemarticle': '',
-    'Sold - новостройки Киева': '',
-    'Инвест-хаки': '',
-    'studwayDIEM': '',
-    'Black Lion | Бизнес Журнал': '',
-    'Почни Щось!': '',
-    'Київ Автомобільний': '',
-    'Правила Дорожнього Руху України': '',
-    'Sci-Fi-News | Кино и жизнь': '',
-    'Кинокляча': '',
-    'HowProgrammingWorks - JavaScript and Node.js Programming': '',
-    'Law&Productivity': '',
-    'DarkNetNews': '',
-    'GEEK|UΔ': '',
-    'DEVrepublik Learning Center': '',
-    'Экстраполяция IT': '',
-    'Геймер': '',
-    'Link of the Day': '',
-    'To Know More': ''
-}
+channellinks = {}
 
 async def main():
     async for dialog in telegramclient.iter_dialogs():
-        if dialog.is_channel and dialog.title in channellinks:
-            if channellinks[dialog.title] != dialog.message.date:
-                channellinks[dialog.title] = dialog.message.date
-                await dialog.message.forward_to('lentaus_bot')
-        
+        dialog_name = str(dialog.name)
+        time = str(dialog.message.date).split(' ')[1].split('+')[0]
+        if dialog.is_channel and dialog.message.message:
+            if dialog_name in channellinks:
+                if channellinks[dialog_name] != time:
+                    channellinks[dialog_name] = time
+                    await dialog.message.forward_to('lentaus_bot')
+            else:
+                channellinks[dialog_name] = ''
+
 
 def run_main():
         with telegramclient:
@@ -283,11 +263,8 @@ schedule.every(1).second.do(aincrawler)
 schedule.every(1).second.do(minfincrawler)
 
 while True:
-    try:
-        run_main()
-        schedule.run_pending()
-        break
-    except Exception as inst:
-        print(type(inst))
+    # schedule.run_pending()
+    run_main()
+
 
 
