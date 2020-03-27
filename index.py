@@ -34,7 +34,7 @@ async def main():
 def run_main():
         with telegramclient:
             telegramclient.loop.run_until_complete(main())
-    
+
 
 reddit = praw.Reddit(client_id='rk_SiB6rupsdbQ', \
                      client_secret='fXQ1Bw_EZCphnD9IDgGpZhy55Rs', \
@@ -263,7 +263,7 @@ schedule.every(1).second.do(aincrawler)
 schedule.every(1).second.do(minfincrawler)
 
 while True:
-    # schedule.run_pending()
+    schedule.run_pending()
     run_main()
 
 
