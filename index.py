@@ -6,30 +6,25 @@ import datetime
 import praw
 import pandas as pd
 import re
+from pymongo import MongoClient
 
-
-
-newslink=''
-reviewlink=''
-articlelink=''
-videolink=''
-blogslink=''
-ainlink = ''
-
-           
 reddit = praw.Reddit(client_id='rk_SiB6rupsdbQ', \
                      client_secret='fXQ1Bw_EZCphnD9IDgGpZhy55Rs', \
                      user_agent='lentaua', \
                      username='olegsan', \
                      password='EnNbGGkG20')
+
+client = MongoClient('mongodb://oleg:1@lentabotcluster-shard-00-00-ioehr.mongodb.net:27017,lentabotcluster-shard-00-01-ioehr.mongodb.net:27017,lentabotcluster-shard-00-02-ioehr.mongodb.net:27017/test?ssl=true&replicaSet=lentabotCluster-shard-0&authSource=admin&retryWrites=true&w=majority')
+
+db = client.lentadb
+collection = db.lentacollection
+
 redditlinks = {}
 
 def redditcrawling():
-    print(redditlinks)
     for sub in reddit.user.subreddits():
         for submission in sub.new(limit=1):
             if str(submission.subreddit_name_prefixed) in redditlinks:
-                print(redditlinks[submission.subreddit_name_prefixed], str(submission.created_utc), submission.subreddit_name_prefixed)
                 if redditlinks[submission.subreddit_name_prefixed] != str(submission.created_utc):
                     redditlinks[submission.subreddit_name_prefixed] = str(submission.created_utc)
                     parameters = {'chat_id': '230618475', 'text': submission.subreddit_name_prefixed + ": " + submission.title + "\n\n" + submission.selftext + "\n" + submission.url}
@@ -37,12 +32,14 @@ def redditcrawling():
             else:
                 redditlinks[submission.subreddit_name_prefixed] = ''
 
+
 def newscrawling():
     '''
     Args: website_link = string; link of website to be crawled
           link_class = string; class name for job link on website
     Returns: jobs_link = list; list of jobs
     '''
+    newslink = collection.find_one({ "newsLink": { "$exists": True } })['newsLink']
 
     # get content of website and parse it
     website_request = requests.get('https://itc.ua/news', timeout=5)
@@ -60,11 +57,12 @@ def newscrawling():
         templink = jobs_link[0].contents[0]['href']
         msgtext =  jobs_link[0].contents[0].contents[0] + "\n" + textpost[0].contents[0]
 
-    global newslink
+    # global newslink
     if newslink != templink:
-        newslink = templink
-        parameters = {'chat_id': '230618475', 'text': msgtext + "\n" + newslink}
+        collection.update_one({'newsLink': newslink}, {"$set": {'newsLink': templink}})
+        parameters = {'chat_id': '230618475', 'text': msgtext + "\n" + templink}
         message = requests.post('https://api.telegram.org/bot1141601443:AAFu7u3KED3498Qa7XUlFWhXosCNA7qOMeU/sendMessage', data=parameters)
+
 
 def reviewcrawling():
     '''
@@ -72,6 +70,7 @@ def reviewcrawling():
           link_class = string; class name for job link on website
     Returns: jobs_link = list; list of jobs
     '''
+    reviewlink = collection.find_one({ "reviewsLink": { "$exists": True } })['reviewsLink']
 
     # get content of website and parse it
     website_request = requests.get('https://itc.ua/articles', timeout=5)
@@ -80,7 +79,7 @@ def reviewcrawling():
     # extract job description
     jobs_link = website_content.find_all(class_ = 'entry-title')
     textpost =  website_content.find_all(class_ = 'entry-excerpt')
-    
+
     if len(jobs_link[0].contents) > 1:
         templink = jobs_link[0].contents[1]['href']
         msgtext =  jobs_link[0].contents[1].contents[0] + "\n" + textpost[0].contents[0]
@@ -88,10 +87,9 @@ def reviewcrawling():
         templink = jobs_link[0].contents[0]['href']
         msgtext =  jobs_link[0].contents[0].contents[0] + "\n" + textpost[0].contents[0]
 
-    global reviewlink
     if reviewlink != templink:
-        reviewlink = templink
-        parameters = {'chat_id': '230618475', 'text': msgtext + "\n" + reviewlink} 
+        collection.update_one({'reviewsLink': reviewlink}, {"$set": {'reviewsLink': templink}})
+        parameters = {'chat_id': '230618475', 'text': msgtext + "\n" + templink}
         message = requests.post('https://api.telegram.org/bot1141601443:AAFu7u3KED3498Qa7XUlFWhXosCNA7qOMeU/sendMessage', data=parameters)
 
 
@@ -101,6 +99,7 @@ def articlecrawling():
           link_class = string; class name for job link on website
     Returns: jobs_link = list; list of jobs
     '''
+    articlelink = collection.find_one({ "articleLink": { "$exists": True } })['articleLink']
 
     # get content of website and parse it
     website_request = requests.get('https://itc.ua/stati', timeout=5)
@@ -109,7 +108,7 @@ def articlecrawling():
     # extract job description
     jobs_link = website_content.find_all(class_ = 'entry-title')
     textpost =  website_content.find_all(class_ = 'entry-excerpt')
-    
+
     if len(jobs_link[0].contents) > 1:
         templink = jobs_link[0].contents[1]['href']
         msgtext =  jobs_link[0].contents[1].contents[0] + "\n" + textpost[0].contents[0]
@@ -117,10 +116,9 @@ def articlecrawling():
         templink = jobs_link[0].contents[0]['href']
         msgtext =  jobs_link[0].contents[0].contents[0] + "\n" + textpost[0].contents[0]
 
-    global articlelink
     if articlelink != templink:
-        articlelink = templink
-        parameters = {'chat_id': '230618475', 'text': msgtext + "\n" + articlelink}
+        collection.update_one({'articleLink': articlelink}, {"$set": {'articleLink': templink}})
+        parameters = {'chat_id': '230618475', 'text': msgtext + "\n" + templink}
         message = requests.post('https://api.telegram.org/bot1141601443:AAFu7u3KED3498Qa7XUlFWhXosCNA7qOMeU/sendMessage', data=parameters)
 
 
@@ -131,6 +129,7 @@ def videocrawling():
           link_class = string; class name for job link on website
     Returns: jobs_link = list; list of jobs
     '''
+    videolink = collection.find_one({ "videoLink": { "$exists": True } })['videoLink']
 
     # get content of website and parse it
     website_request = requests.get('https://itc.ua/video', timeout=5)
@@ -139,7 +138,7 @@ def videocrawling():
     # extract job description
     jobs_link = website_content.find_all(class_ = 'entry-title')
     textpost =  website_content.find_all(class_ = 'entry-excerpt')
-    
+
     if len(jobs_link[0].contents) > 1:
         templink = jobs_link[0].contents[1]['href']
         msgtext =  jobs_link[0].contents[1].contents[0] + "\n" + textpost[0].contents[0]
@@ -147,10 +146,9 @@ def videocrawling():
         templink = jobs_link[0].contents[0]['href']
         msgtext =  jobs_link[0].contents[0].contents[0] + "\n" + textpost[0].contents[0]
 
-    global videolink
     if videolink != templink:
-        videolink = templink
-        parameters = {'chat_id': '230618475', 'text': msgtext + "\n" + videolink}
+        collection.update_one({'videoLink': videolink}, {"$set": {'videoLink': templink}})
+        parameters = {'chat_id': '230618475', 'text': msgtext + "\n" + templink}
         message = requests.post('https://api.telegram.org/bot1141601443:AAFu7u3KED3498Qa7XUlFWhXosCNA7qOMeU/sendMessage', data=parameters)
 
 
@@ -160,7 +158,8 @@ def blogcrawling():
           link_class = string; class name for job link on website
     Returns: jobs_link = list; list of jobs
     '''
-
+    blogslink = collection.find_one({ "blogsLink": { "$exists": True } })['blogsLink']
+   
     # get content of website and parse it
     website_request = requests.get('https://itc.ua/blogs', timeout=5)
 
@@ -168,7 +167,7 @@ def blogcrawling():
     # extract job description
     jobs_link = website_content.find_all(class_ = 'entry-title')
     textpost =  website_content.find_all(class_ = 'entry-excerpt')
-   
+
     if len(jobs_link[0].contents) > 1:
         templink = jobs_link[0].contents[1]['href']
         msgtext =  jobs_link[0].contents[1].contents[0] + "\n" + textpost[0].contents[0]
@@ -176,10 +175,9 @@ def blogcrawling():
         templink = jobs_link[0].contents[0]['href']
         msgtext =  jobs_link[0].contents[0].contents[0] + "\n" + textpost[0].contents[0]
 
-    global blogslink
     if blogslink != templink:
-        blogslink = templink
-        parameters = {'chat_id': '230618475', 'text': msgtext + "\n" + blogslink}
+        collection.update_one({'blogsLink': blogslink}, {"$set": {'blogsLink': templink}})
+        parameters = {'chat_id': '230618475', 'text': msgtext + "\n" + templink}
         message = requests.post('https://api.telegram.org/bot1141601443:AAFu7u3KED3498Qa7XUlFWhXosCNA7qOMeU/sendMessage', data=parameters)
 
 
@@ -190,22 +188,20 @@ def aincrawler():
           link_class = string; class name for job link on website
     Returns: jobs_link = list; list of jobs
     '''
+    ainlink = collection.find_one({ "ainLink": { "$exists": True } })['ainLink']
 
     # get content of website and parse it
     website_request = requests.get('https://ain.ua/post-list/', timeout=5)
     website_content = BeautifulSoup(website_request.content, 'html.parser')
-   
+
     # extract job description
     jobs_link = website_content.find_all(class_ = 'post-link')
 
-    global ainlink
     if ainlink != jobs_link[0]['href']:
-        ainlink = jobs_link[0]['href']
-        parameters = {'chat_id': '230618475', 'text': jobs_link[0].contents[0] + "\n" + ainlink}
+        collection.update_one({'ainLink': ainlink}, {"$set": {'ainLink': jobs_link[0]['href']}})
+        parameters = {'chat_id': '230618475', 'text': jobs_link[0].contents[0] + "\n" + jobs_link[0]['href']}
         message = requests.post('https://api.telegram.org/bot1141601443:AAFu7u3KED3498Qa7XUlFWhXosCNA7qOMeU/sendMessage', data=parameters)
 
-
-minfinlink = ''
 
 def minfincrawler():
     '''
@@ -213,6 +209,7 @@ def minfincrawler():
           link_class = string; class name for job link on website
     Returns: jobs_link = list; list of jobs
     '''
+    minfinlink = collection.find_one({ "minfinLink": { "$exists": True } })['minfinLink']
 
     # get content of website and parse it
     website_request = requests.get('https://minfin.com.ua/ua/news/', timeout=5)
@@ -220,9 +217,8 @@ def minfincrawler():
 
     jobs_link = website_content.find_all(class_ = 'item')
 
-    global minfinlink
     if minfinlink != jobs_link[0].contents[3].contents[1]['href']:
-        minfinlink = jobs_link[0].contents[3].contents[1]['href']
+        collection.update_one({'minfinLink': minfinlink}, {"$set": {'minfinLink': jobs_link[0].contents[3].contents[1]['href']}})
         parameters = {'chat_id': '230618475', 'text': jobs_link[0].contents[3].contents[1].text + "\n" + 'https://minfin.com.ua'+jobs_link[0].contents[3].contents[1]['href']}
         message = requests.post('https://api.telegram.org/bot1141601443:AAFu7u3KED3498Qa7XUlFWhXosCNA7qOMeU/sendMessage', data=parameters)
 
