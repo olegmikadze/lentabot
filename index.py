@@ -11,29 +11,34 @@ from telethon import TelegramClient, events
 from telethon.tl.custom.chatgetter import ChatGetter
 import asyncio
 
+client = MongoClient('mongodb://oleg:1@lentabotcluster-shard-00-00-ioehr.mongodb.net:27017,lentabotcluster-shard-00-01-ioehr.mongodb.net:27017,lentabotcluster-shard-00-02-ioehr.mongodb.net:27017/test?ssl=true&replicaSet=lentabotCluster-shard-0&authSource=admin&retryWrites=true&w=majority')
+
+db = client.lentadb
+collection = db.lentacollection
+
 
 # Use your own values from my.telegram.org
 api_id = 1351607
 api_hash = '78482690f0761d1396e013a98c93e7b8'
 telegramclient = TelegramClient('anon', api_id, api_hash)
-channellinks = {}
 
 async def main():
+    channellinks = collection.find_one({'doc_id': 'telegramLinks'})
     async for dialog in telegramclient.iter_dialogs():
-        dialog_name = str(dialog.name)
+        dialog_name = str(dialog.id)
         time = str(dialog.message.date).split(' ')[1].split('+')[0]
         if dialog.is_channel and dialog.message.message:
             if dialog_name in channellinks:
                 if channellinks[dialog_name] != time:
-                    channellinks[dialog_name] = time
+                    collection.find_one_and_update({ 'doc_id': 'telegramLinks'}, { '$set': { dialog_name: time }} )
                     await dialog.message.forward_to('lentaus_bot')
             else:
-                channellinks[dialog_name] = ''
-
+                collection.find_one_and_update({ 'doc_id': 'telegramLinks'}, { '$set': { dialog_name: '' }} )
 
 def run_main():
         with telegramclient:
             telegramclient.loop.run_until_complete(main())
+
 
 
 reddit = praw.Reddit(client_id='rk_SiB6rupsdbQ', \
@@ -42,10 +47,6 @@ reddit = praw.Reddit(client_id='rk_SiB6rupsdbQ', \
                      username='olegsan', \
                      password='EnNbGGkG20')
 
-client = MongoClient('mongodb://oleg:1@lentabotcluster-shard-00-00-ioehr.mongodb.net:27017,lentabotcluster-shard-00-01-ioehr.mongodb.net:27017,lentabotcluster-shard-00-02-ioehr.mongodb.net:27017/test?ssl=true&replicaSet=lentabotCluster-shard-0&authSource=admin&retryWrites=true&w=majority')
-
-db = client.lentadb
-collection = db.lentacollection
 
 redditlinks = {}
 
@@ -237,7 +238,7 @@ def minfincrawler():
           link_class = string; class name for job link on website
     Returns: jobs_link = list; list of jobs
     '''
-    minfinlink = collection.find_one({ "minfinLink": { "$exists": True } })['minfinLink']
+    minfinlink = collection.find_one({ "minfinLink": { "$exists": True } })['   ']
 
     # get content of website and parse it
     website_request = requests.get('https://minfin.com.ua/ua/news/', timeout=5)
