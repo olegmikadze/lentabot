@@ -225,7 +225,7 @@ def aincrawler():
 
     # extract job description
     jobs_link = website_content.find_all(class_ = 'post-link')
-
+    print(jobs_link)
     if ainlink != jobs_link[0]['href']:
         collection.update_one({'ainLink': ainlink}, {"$set": {'ainLink': jobs_link[0]['href']}})
         parameters = {'chat_id': '230618475', 'text': jobs_link[0].contents[0] + "\n" + jobs_link[0]['href']}
@@ -262,10 +262,14 @@ schedule.every(1).second.do(blogcrawling)
 schedule.every(1).second.do(redditcrawling)
 schedule.every(1).second.do(aincrawler)
 schedule.every(1).second.do(minfincrawler)
+schedule.every(1).second.do(run_main)
+
 
 while True:
-    schedule.run_pending()
-    run_main()
+    try:
+        schedule.run_pending()
+    except Exception as inst:
+        print(type(inst), inst.args, inst)
 
 
 
