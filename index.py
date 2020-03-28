@@ -238,7 +238,7 @@ def minfincrawler():
           link_class = string; class name for job link on website
     Returns: jobs_link = list; list of jobs
     '''
-    minfinlink = collection.find_one({ "minfinLink": { "$exists": True } })['   ']
+    minfinlink = collection.find_one({ "minfinLink": { "$exists": True } })['minfinLink']
 
     # get content of website and parse it
     website_request = requests.get('https://minfin.com.ua/ua/news/', timeout=5)
