@@ -26,7 +26,7 @@ async def main():
     channellinks = collection.find_one({'doc_id': 'telegramLinks'})
     async for dialog in telegramclient.iter_dialogs():
         dialog_name = str(dialog.id)
-        time = str(dialog.message.date).split(' ')[1].split('+')[0]
+        time = str(dialog.message.date).split('+')[0]
         if dialog.is_channel and dialog.message.message:
             if dialog_name in channellinks:
                 if channellinks[dialog_name] != time:
