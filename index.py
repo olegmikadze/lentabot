@@ -48,18 +48,18 @@ reddit = praw.Reddit(client_id='rk_SiB6rupsdbQ', \
                      password='EnNbGGkG20')
 
 
-redditlinks = {}
 
 def redditcrawling():
+    redditlinks = collection.find_one({'doc_id': 'redditLinks'})
     for sub in reddit.user.subreddits():
         for submission in sub.new(limit=1):
             if str(submission.subreddit_name_prefixed) in redditlinks:
                 if redditlinks[submission.subreddit_name_prefixed] != str(submission.created_utc):
-                    redditlinks[submission.subreddit_name_prefixed] = str(submission.created_utc)
+                    collection.find_one_and_update({ 'doc_id': 'redditLinks'}, { '$set': { submission.subreddit_name_prefixed: str(submission.created_utc) }} )
                     parameters = {'chat_id': '230618475', 'text': submission.subreddit_name_prefixed + ": " + submission.title + "\n\n" + submission.selftext + "\n" + submission.url}
                     message = requests.post('https://api.telegram.org/bot1141601443:AAFu7u3KED3498Qa7XUlFWhXosCNA7qOMeU/sendMessage', data=parameters)
             else:
-                redditlinks[submission.subreddit_name_prefixed] = ''
+                collection.find_one_and_update({ 'doc_id': 'redditLinks'}, { '$set': { submission.subreddit_name_prefixed: '' }} )
 
 
 def newscrawling():
@@ -210,47 +210,50 @@ def blogcrawling():
         message = requests.post('https://api.telegram.org/bot1141601443:AAFu7u3KED3498Qa7XUlFWhXosCNA7qOMeU/sendMessage', data=parameters)
 
 
+# schedule.every(1).second.do(aincrawler)
 
-def aincrawler():
-    '''
-    Args: website_link = string; link of website to be crawled
-          link_class = string; class name for job link on website
-    Returns: jobs_link = list; list of jobs
-    '''
-    ainlink = collection.find_one({ "ainLink": { "$exists": True } })['ainLink']
+# def aincrawler():
+#     '''
+#     Args: website_link = string; link of website to be crawled
+#           link_class = string; class name for job link on website
+#     Returns: jobs_link = list; list of jobs
+#     '''
+#     ainlink = collection.find_one({ "ainLink": { "$exists": True } })['ainLink']
 
-    # get content of website and parse it
-    website_request = requests.get('https://ain.ua/post-list/', timeout=5)
-    website_content = BeautifulSoup(website_request.content, 'html.parser')
+#     # get content of website and parse it
+#     website_request = requests.get('https://ain.ua/post-list/', timeout=5)
+#     website_content = BeautifulSoup(website_request.content, 'html.parser')
+#     # extract job description
+#     jobs_link = website_content.find_all(class_ = 'post-link')
 
-    # extract job description
-    jobs_link = website_content.find_all(class_ = 'post-link')
-    if ainlink != jobs_link[0]['href']:
-        collection.update_one({'ainLink': ainlink}, {"$set": {'ainLink': jobs_link[0]['href']}})
-        parameters = {'chat_id': '230618475', 'text': jobs_link[0].contents[0] + "\n" + jobs_link[0]['href']}
-        message = requests.post('https://api.telegram.org/bot1141601443:AAFu7u3KED3498Qa7XUlFWhXosCNA7qOMeU/sendMessage', data=parameters)
-
-
-def minfincrawler():
-    '''
-    Args: website_link = string; link of website to be crawled
-          link_class = string; class name for job link on website
-    Returns: jobs_link = list; list of jobs
-    '''
-    minfinlink = collection.find_one({ "minfinLink": { "$exists": True } })['minfinLink']
-
-    # get content of website and parse it
-    website_request = requests.get('https://minfin.com.ua/ua/news/', timeout=5)
-    website_content = BeautifulSoup(website_request.content, 'html.parser')
-
-    jobs_link = website_content.find_all(class_ = 'item')
-
-    if minfinlink != jobs_link[0].contents[3].contents[1]['href']:
-        collection.update_one({'minfinLink': minfinlink}, {"$set": {'minfinLink': jobs_link[0].contents[3].contents[1]['href']}})
-        parameters = {'chat_id': '230618475', 'text': jobs_link[0].contents[3].contents[1].text + "\n" + 'https://minfin.com.ua'+jobs_link[0].contents[3].contents[1]['href']}
-        message = requests.post('https://api.telegram.org/bot1141601443:AAFu7u3KED3498Qa7XUlFWhXosCNA7qOMeU/sendMessage', data=parameters)
+#     if len(jobs_link) > 1:
+#         print(jobs_link)
+#         if ainlink != jobs_link[0]['href']:
+#             collection.update_one({'ainLink': ainlink}, {"$set": {'ainLink': jobs_link[0]['href']}})
+#             parameters = {'chat_id': '230618475', 'text': jobs_link[0].contents[0] + "\n" + jobs_link[0]['href']}
+#             message = requests.post('https://api.telegram.org/bot1141601443:AAFu7u3KED3498Qa7XUlFWhXosCNA7qOMeU/sendMessage', data=parameters)
 
 
+# schedule.every(1).second.do(minfincrawler)
+
+# def minfincrawler():
+#     '''
+#     Args: website_link = string; link of website to be crawled
+#           link_class = string; class name for job link on website
+#     Returns: jobs_link = list; list of jobs
+#     '''
+#     minfinlink = collection.find_one({ "minfinLink": { "$exists": True } })['minfinLink']
+
+#     # get content of website and parse it
+#     website_request = requests.get('https://minfin.com.ua/ua/news/', timeout=5)
+#     website_content = BeautifulSoup(website_request.content, 'html.parser')
+
+#     jobs_link = website_content.find_all(class_ = 'item')
+
+#     if minfinlink != jobs_link[0].contents[3].contents[1]['href']:
+#         collection.update_one({'minfinLink': minfinlink}, {"$set": {'minfinLink': jobs_link[0].contents[3].contents[1]['href']}})
+#         parameters = {'chat_id': '230618475', 'text': jobs_link[0].contents[3].contents[1].text + "\n" + 'https://minfin.com.ua'+jobs_link[0].contents[3].contents[1]['href']}
+#         message = requests.post('https://api.telegram.org/bot1141601443:AAFu7u3KED3498Qa7XUlFWhXosCNA7qOMeU/sendMessage', data=parameters)
 
 
 schedule.every(1).second.do(newscrawling)
@@ -259,8 +262,6 @@ schedule.every(1).second.do(articlecrawling)
 schedule.every(1).second.do(videocrawling)
 schedule.every(1).second.do(blogcrawling)
 schedule.every(1).second.do(redditcrawling)
-schedule.every(1).second.do(aincrawler)
-schedule.every(1).second.do(minfincrawler)
 schedule.every(1).second.do(run_main)
 
 
