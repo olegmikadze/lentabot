@@ -11,6 +11,8 @@ from telethon import TelegramClient, events
 from telethon.tl.custom.chatgetter import ChatGetter
 import asyncio
 
+# class for link in twitter
+
 client = MongoClient('mongodb://oleg:1@lentabotcluster-shard-00-00-ioehr.mongodb.net:27017,lentabotcluster-shard-00-01-ioehr.mongodb.net:27017,lentabotcluster-shard-00-02-ioehr.mongodb.net:27017/test?ssl=true&replicaSet=lentabotCluster-shard-0&authSource=admin&retryWrites=true&w=majority')
 
 db = client.lentadb
@@ -261,7 +263,7 @@ schedule.every(1).second.do(reviewcrawling)
 schedule.every(1).second.do(articlecrawling)
 schedule.every(1).second.do(videocrawling)
 schedule.every(1).second.do(blogcrawling)
-schedule.every(1).second.do(redditcrawling)
+# schedule.every(1).second.do(redditcrawling)
 schedule.every(1).second.do(run_main)
 
 
