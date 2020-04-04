@@ -17,7 +17,7 @@ import asyncio
 api_id = 1351607
 api_hash = '78482690f0761d1396e013a98c93e7b8'
 telegramclient = TelegramClient('anon', api_id, api_hash)
-telegramclient.start()
+telegramclient.connect()
 
 #Mongo
 client = MongoClient('mongodb://oleg:1@lentabotcluster-shard-00-00-ioehr.mongodb.net:27017,lentabotcluster-shard-00-01-ioehr.mongodb.net:27017,lentabotcluster-shard-00-02-ioehr.mongodb.net:27017/test?ssl=true&replicaSet=lentabotCluster-shard-0&authSource=admin&retryWrites=true&w=majority');
