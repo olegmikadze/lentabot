@@ -266,7 +266,7 @@ schedule.every(1).second.do(reviewcrawling)
 schedule.every(1).second.do(articlecrawling)
 schedule.every(1).second.do(videocrawling)
 schedule.every(1).second.do(blogcrawling)
-# schedule.every(1).second.do(redditcrawling)
+schedule.every(1).second.do(redditcrawling)
 schedule.every(1).second.do(run_main)
 
 
