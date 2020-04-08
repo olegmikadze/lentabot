@@ -40,10 +40,6 @@ async def main():
             else:
                 collection.find_one_and_update({ 'doc_id': 'telegramLinks'}, { '$set': { dialog_name: '' }} )
 
-def run_main():
-        with telegramclient:
-            telegramclient.loop.run_until_complete(main())
-
 
 
 reddit = praw.Reddit(client_id='rk_SiB6rupsdbQ', \
@@ -267,12 +263,14 @@ schedule.every(1).second.do(articlecrawling)
 schedule.every(1).second.do(videocrawling)
 schedule.every(1).second.do(blogcrawling)
 schedule.every(1).second.do(redditcrawling)
-schedule.every(1).second.do(run_main)
+
 
 
 while True:
     try:
         schedule.run_pending()
+        with telegramclient:
+            telegramclient.loop.run_until_complete(main())
     except Exception as inst:
         print(type(inst), inst.args, inst)
 
