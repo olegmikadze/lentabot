@@ -27,11 +27,15 @@ collection = db.lentacollection;
 
 
 async def main():
+    # get all saved telegram chanels from db
     channellinks = collection.find_one({'doc_id': 'telegramLinks'})
+
+    # loop throw the dialogs of telegram client
     async for dialog in telegramclient.iter_dialogs():
         dialog_name = str(dialog.id)
         time = str(dialog.message.date).split('+')[0]
         if dialog.is_channel and dialog.message.message:
+            # if channel exists in db
             if dialog_name in channellinks:
                 if channellinks[dialog_name] != time:
                     collection.find_one_and_update({ 'doc_id': 'telegramLinks'}, { '$set': { dialog_name: time }} )
@@ -256,20 +260,27 @@ def blogcrawling():
 #         message = requests.post('https://api.telegram.org/bot1141601443:AAFu7u3KED3498Qa7XUlFWhXosCNA7qOMeU/sendMessage', data=parameters)
 
 
+def runtele():
+    with client:
+        telegramclient.loop.run_until_complete(main())
+
 schedule.every(1).second.do(newscrawling)
 schedule.every(1).second.do(reviewcrawling)
 schedule.every(1).second.do(articlecrawling)
 schedule.every(1).second.do(videocrawling)
 schedule.every(1).second.do(blogcrawling)
 schedule.every(1).second.do(redditcrawling)
+schedule.every(1).second.do(runtele)
 
 
+
+# loop = asyncio.get_event_loop()
+# loop.create_task(main())
 
 while True:
     try:
         schedule.run_pending()
-        with telegramclient:
-            telegramclient.loop.run_until_complete(main())
+
     except Exception as inst:
         print(type(inst), inst.args, inst)
 
