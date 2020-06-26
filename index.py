@@ -39,7 +39,9 @@ async def main():
             if dialog_name in channellinks:
                 if channellinks[dialog_name] != time:
                     collection.find_one_and_update({ 'doc_id': 'telegramLinks'}, { '$set': { dialog_name: time }} )
-                    await dialog.message.forward_to('lentaus_bot')
+                    # await dialog.message.send_message('lentaus_bot')
+                    await telegramclient.send_message('lentaus_bot', dialog.message)
+
             else:
                 collection.find_one_and_update({ 'doc_id': 'telegramLinks'}, { '$set': { dialog_name: '' }} )
 
@@ -264,11 +266,11 @@ def runtele():
     with client:
         telegramclient.loop.run_until_complete(main())
 
-schedule.every(1).second.do(newscrawling)
-schedule.every(1).second.do(reviewcrawling)
-schedule.every(1).second.do(articlecrawling)
-schedule.every(1).second.do(videocrawling)
-schedule.every(1).second.do(blogcrawling)
+# schedule.every(1).second.do(newscrawling)
+# schedule.every(1).second.do(reviewcrawling)
+# schedule.every(1).second.do(articlecrawling)
+# schedule.every(1).second.do(videocrawling)
+# schedule.every(1).second.do(blogcrawling)
 # schedule.every(1).second.do(redditcrawling)
 schedule.every(1).second.do(runtele)
 
