@@ -39,9 +39,7 @@ async def main():
             if dialog_name in channellinks:
                 if channellinks[dialog_name] != time:
                     collection.find_one_and_update({ 'doc_id': 'telegramLinks'}, { '$set': { dialog_name: time }} )
-                    # await dialog.message.send_message('lentaus_bot')
-                    await telegramclient.send_message('lentaus_bot', dialog.message, silent: bool = False)
-
+                    await dialog.message.forward_to('lentaus_bot')
             else:
                 collection.find_one_and_update({ 'doc_id': 'telegramLinks'}, { '$set': { dialog_name: '' }} )
 
